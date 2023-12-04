@@ -10,6 +10,7 @@ from mathutils import Vector, Matrix , Quaternion
 import bmesh
 from ..main.common import json_ver_validate
 from .phys_import import cp77_phys_import
+from .inkwidget_import import import_inkwidget
 
 # The appearance list needs to be the appearanceNames for each ent that you want to import, will import all if not specified
 # if you've already imported the body/head and set the rig up you can exclude them by putting them in the exclude_meshes list 
@@ -250,6 +251,10 @@ def importEnt( filepath='', appearances=[], exclude_meshes=[], with_materials=Tr
                 comps= j['Data']['RootChunk']['components']
 
             for c in comps:
+                if "widgetResource" in c.keys():
+                        inkFile = c["widgetResource"]["DepotPath"]["$value"]
+                        inkFilePath = os.path.join(path,inkFile)+'.json'
+                        name = c["name"]["$value"]
                 if 'mesh' in c.keys() or 'graphicsMesh' in c.keys():
                    # print(c['mesh']['DepotPath']['$value'])
                     meshname=''
@@ -546,7 +551,13 @@ def importEnt( filepath='', appearances=[], exclude_meshes=[], with_materials=Tr
                                 #else:
                                 except:
                                     print("Failed on ",meshname)
-     
+                for chunk in chunks:
+                    if "meshTargetBinding" in chunk.keys() and chunk["meshTargetBinding"].get("Data"):
+                        for obj in objs:
+                            if obj['componentName'] in chunk["meshTargetBinding"]["Data"]["bindName"]["$value"]:
+                                import_inkwidget(inkFilePath)
+
+
               # find the .phys file jsons
     if include_collisions:
         physJsonPaths = glob.glob(path + "\**\*.phys.json", recursive=True)
