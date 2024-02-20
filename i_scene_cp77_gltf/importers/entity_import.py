@@ -254,7 +254,8 @@ def importEnt( filepath='', appearances=[], exclude_meshes=[], with_materials=Tr
                 if "widgetResource" in c.keys():
                         inkFile = c["widgetResource"]["DepotPath"]["$value"]
                         inkFilePath = os.path.join(path,inkFile)+'.json'
-                        name = c["name"]["$value"]
+                        inkname = c["name"]["$value"]
+                        #print(name)
                 if 'mesh' in c.keys() or 'graphicsMesh' in c.keys():
                    # print(c['mesh']['DepotPath']['$value'])
                     meshname=''
@@ -555,7 +556,13 @@ def importEnt( filepath='', appearances=[], exclude_meshes=[], with_materials=Tr
                     if "meshTargetBinding" in chunk.keys() and chunk["meshTargetBinding"].get("Data"):
                         for obj in objs:
                             if obj['componentName'] in chunk["meshTargetBinding"]["Data"]["bindName"]["$value"]:
-                                import_inkwidget(inkFilePath)
+                                obj['inkTexName'] = inkname
+                                try:
+                                    import_inkwidget(inkFilePath)
+                                    
+                                except:
+                                    print("error in inkwidget import")
+                                    continue
 
 
               # find the .phys file jsons

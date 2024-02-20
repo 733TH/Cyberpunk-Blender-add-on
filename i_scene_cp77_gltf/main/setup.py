@@ -28,6 +28,7 @@ from ..material_types.decal import Decal
 from ..material_types.decal_gradientmap_recolor import DecalGradientmapRecolor
 from ..material_types.televisionad import TelevisionAd
 from ..material_types.window_parallax_interior_proxy import windowParallaxIntProx
+from ..material_types.metal_base_ui import MetalBaseUI
 from ..material_types.unknown import unknownMaterial
 
 
@@ -184,6 +185,10 @@ class MaterialBuilder:
                 case "base\\materials\\window_parallax_interior_proxy.mt" | "base\\materials\\window_parallax_interior.mt":
                     window = windowParallaxIntProx(self.BasePath,self.image_format,self.ProjPath)
                     window.create(rawMat["Data"],bpyMat)
+
+                case "base\\materials\\metal_base_ui.mt" | "base\\fx\\shaders\\parallaxscreen_transparent_ui.mt":
+                    metalBaseUI = MetalBaseUI(self.BasePath,self.image_format,self.ProjPath)
+                    metalBaseUI.create(rawMat["Data"],bpyMat)
                 
                 case _:
                     print('Unhandled mt - ', rawMat["MaterialTemplate"])

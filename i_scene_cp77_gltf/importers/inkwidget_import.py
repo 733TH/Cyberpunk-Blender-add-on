@@ -6,6 +6,7 @@ import gpu
 import glob
 from collections import defaultdict
 from mathutils import Matrix
+from ..main.common import *
 
 
 
@@ -45,8 +46,8 @@ def get_pos(anchor, margin, width, height):
         y = margin['top']
 
     elif "TopRight" in anchor:
-        x = width - margin['right']
-        y = height - margin['top']
+        x = (width/2) - margin['right']
+        y = (height/2) - margin['top']
 
     elif "BottomLeft" in anchor:
         x = -(width/2) + margin['left']
@@ -105,7 +106,6 @@ def generate_inkwidget_texture(data, filepath):
         fb = gpu.state.active_framebuffer_get()
         fb.clear(color=(0.0, 0.0, 0.0, 0.0))
         with gpu.matrix.push_pop():
-            # reset matrices -> use normalized device coordinates [-1, 1]
             projection_matrix = Matrix.Diagonal( (2/width, 2/height, .0) )
             projection_matrix = Matrix.Translation( (.0,.0,1) ) @ projection_matrix.to_4x4()
             gpu.matrix.load_projection_matrix(projection_matrix)
@@ -135,6 +135,7 @@ def generate_inkwidget_texture(data, filepath):
 
     buffer.dimensions = width * height * 4
     image.pixels = [v / 255 for v in buffer]
+    return image
 
 
 def import_inkwidget(filepath):
@@ -151,7 +152,12 @@ def import_inkwidget(filepath):
         recursive_parser(l[entry], parsed_data)
     
     data = dict(parsed_data)
-    generate_inkwidget_texture(data, filepath)
+    image = generate_inkwidget_texture(data, filepath)
+    ob = bpy.context.active_object
+    mat = ob.active_material.node_tree
+    imgnode = create_node(mat.nodes,"ShaderNodeTexImage",(-1500,0))
+    imgnode.image = image
+
 
 
 
